@@ -14,7 +14,7 @@ I built this to actually stress-test my own scholarship and career decisions, no
 
 ```
 What decision are you wrestling with?
-> Accept a fully-funded scholarship abroad vs. stay and grow my startup
+> Accept a fully funded scholarship abroad vs. stay and grow my startup
 
 Option 1 (or 'done')
 > Accepted the scholarship
@@ -26,23 +26,23 @@ Option 3 (or 'done')
 > done
 
 Any context that matters (values, constraints, what you care about)?
-> Early-stage founder, agri-tech product already has real users, but no formal CS degree yet
+> Early stage founder, agri tech product already has real users, but no formal CS degree yet
 
 --- Debate ---
 
 Future You: Accepted the scholarship: The degree opened doors I couldn't
-have opened alone — credibility with investors, a network I didn't have
+have opened alone credibility with investors, a network I didn't have
 before. But the startup lost a year of momentum I'm still not sure it
 recovered from...
 
 Future You: Stayed and grew the startup: I don't regret staying, the
 product is real and it's growing. But I'd be lying if I said the lack of
-a degree never closed a door — there were rooms I couldn't get into...
+a degree never closed a door there were rooms I couldn't get into...
 ```
 
 ## Features
 
-- Generates a distinct, consistent "future self" persona per option — not a generic pro/con list
+- Generates a distinct, consistent "future self" persona per option not a generic pro/con list
 - Multi-round debate where each persona responds to what the others actually said
 - Personas are grounded in your real context (values, constraints), not generic advice
 - Clean separation between persona generation, debate orchestration, and the API client, so any piece can be swapped or extended independently
@@ -51,7 +51,7 @@ a degree never closed a door — there were rooms I couldn't get into...
 
 - Python 3.10+
 - [Anthropic API](https://docs.claude.com) (Claude) — generates each persona's turn in the debate
-- pytest — test suite, using a fake client so tests run without a live API key
+- pytest, test suite, using a fake client so tests run without a live API key
 
 ## Getting Started
 
@@ -102,7 +102,7 @@ decision-simulator/
 
 ## What I Learned
 
-Getting the debate to feel like a genuine argument instead of two monologues took more prompt design than I expected — the first version had each persona just restating their initial position every round. Feeding each persona the full transcript so far, and explicitly instructing it to push back rather than repeat itself, is what actually made the later rounds respond to each other. I also learned to design the client as a separate, swappable module specifically so the test suite could run against a fake version of it — without that separation, testing the debate logic would have meant either burning API calls on every test run or not testing it at all.
+Getting the debate to feel like a genuine argument instead of two monologues took more prompt design than I expected the first version had each persona just restating their initial position every round. Feeding each persona the full transcript so far, and explicitly instructing it to push back rather than repeat itself, is what actually made the later rounds respond to each other. I also learned to design the client as a separate, swappable module specifically so the test suite could run against a fake version of it without that separation, testing the debate logic would have meant either burning API calls on every test run or not testing it at all.
 
 ## Future Improvements
 
