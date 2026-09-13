@@ -63,8 +63,8 @@ a degree never closed a door — there were rooms I couldn't get into...
 ### Installation
 
 ```bash
-git clone https://github.com/MugdhoAI/Decision-simulator.git
-cd Decision-simulator
+git clone https://github.com/MugdhoAI/Decision-Simulator.git
+cd Decision-Simulator
 pip install -r requirements.txt
 export ANTHROPIC_API_KEY="your-key-here"
 ```
