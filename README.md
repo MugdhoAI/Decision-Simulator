@@ -1,12 +1,12 @@
 # Decision Simulator
 
-A decision-support tool that stages a debate between multiple future versions of yourself — each shaped by a different choice you could make — so you can surface blind spots before you commit to a real decision.
+A decision support tool that stages a debate between multiple future versions of yourself each shaped by a different choice you could make so you can surface blind spots before you commit to a real decision.
 
-You describe a decision you're wrestling with and the options on the table. The tool generates one "future you" persona per option, and runs a multi-round debate between them: each persona argues from having actually lived with the consequences of their choice, and responds directly to what the other personas say, rather than repeating a fixed script.
+You describe a decision you're wrestling with and the options on the table. The tool generates one "future you" persona per option, and runs a multibround debate between them: each persona argues from having actually lived with the consequences of their choice, and responds directly to what the other personas say, rather than repeating a fixed script.
 
 ## Why this exists
 
-Most AI decision tools just give you a single, neutral-sounding answer. That's not how real decisions get stress-tested — you weigh a decision better when you hear a strong, specific case for each path, not a hedge. This tool forces that by giving each possible future a voice, an argument, and a reason to disagree with the others.
+Most AI decision tools just give you a single, neutral sounding answer. That's not how real decisions get stress tested, you weigh a decision better when you hear a strong, specific case for each path, not a hedge. This tool forces that by giving each possible future a voice, an argument, and a reason to disagree with the others.
 
 I built this to actually stress-test my own scholarship and career decisions, not as a hypothetical demo.
 
