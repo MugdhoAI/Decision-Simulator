@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import argparse
 import sys
 
 import anthropic
 
+from src import __version__
 from src.client import ClaudeClient
-from src.debate import Debate
 from src.interfaces import TextGenerator
+from src.validation import validate_decision, validate_options
+from src.debate import Debate
 from src.persona import build_personas
 
 
@@ -55,24 +58,59 @@ def run_simulation(
     return Debate(client, personas, decision).run(rounds=rounds)
 
 
-def main() -> int:
-    print("=== Decision Simulator ===")
-    print("Stage a debate between your possible future selves.\n")
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Stress-test a decision by debating simulated future selves."
+    )
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
+    parser.add_argument("--decision", help="Decision to stress-test.")
+    parser.add_argument(
+        "--option",
+        action="append",
+        dest="options",
+        help="Decision option. Repeat this flag for each option.",
+    )
+    parser.add_argument("--context", default="", help="Background, values, and constraints.")
+    parser.add_argument(
+        "--rounds",
+        type=int,
+        default=2,
+        help="Number of debate rounds (default: 2).",
+    )
+    return parser
+
+
+def main(argv: list[str] | None = None, client: TextGenerator | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+
     try:
-        decision, options, user_context = collect_inputs()
+        if args.decision is None and args.options is None:
+            decision, options, user_context = collect_inputs()
+        elif args.decision is None or not args.options:
+            parser.error("--decision and at least two --option values must be provided together.")
+        else:
+            decision = validate_decision(args.decision)
+            options = validate_options(args.options)
+            user_context = args.context.strip()
+
+        if args.rounds < 1:
+            parser.error("--rounds must be at least 1.")
+
+        generator = client or ClaudeClient()
         transcript = run_simulation(
             decision,
             options,
             user_context,
-            ClaudeClient(),
-            rounds=2,
+            generator,
+            rounds=args.rounds,
         )
     except (ValueError, anthropic.APIError) as exc:
-        print(f"\nError: {exc}", file=sys.stderr)
+        print(f"Error: {exc}", file=sys.stderr)
         return 1
-    except Exception as exc:
-        print(f"\nUnexpected error: {exc}", file=sys.stderr)
-        return 1
+    except KeyboardInterrupt:
+        print("\nCancelled.", file=sys.stderr)
+        return 130
 
     print("\n--- Debate ---\n")
     for line in transcript:
