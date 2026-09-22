@@ -1,60 +1,27 @@
-"""
-Thin wrapper around the Anthropic API.
-
-Kept separate from the rest of the app so the persona/debate logic
-never touches HTTP details directly, and so it can be swapped or
-mocked easily in tests.
-"""
-
 from __future__ import annotations
-
 import os
-from typing import Optional
-
 import anthropic
+from src.interfaces import TextGenerator
 
-
-class ClaudeClient:
-    """Wraps the Anthropic Messages API for single-turn text generation."""
-
-    def __init__(self, api_key: Optional[str] = None, model: str = "claude-sonnet-4-5") -> None:
-        """
-        Args:
-            api_key: Anthropic API key. If not provided, read from the
-                ANTHROPIC_API_KEY environment variable.
-            model: Model name to use for generation.
-
-        Raises:
-            ValueError: If no API key is available from either source.
-        """
+class ClaudeClient(TextGenerator):
+    """Small adapter around the Anthropic Messages API."""
+    def __init__(self, api_key: str | None = None, model: str | None = None) -> None:
         resolved_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
         if not resolved_key:
-            raise ValueError(
-                "No Anthropic API key found. Set the ANTHROPIC_API_KEY "
-                "environment variable or pass api_key explicitly."
-            )
+            raise ValueError("No Anthropic API key found. Set ANTHROPIC_API_KEY or pass api_key explicitly.")
         self._client = anthropic.Anthropic(api_key=resolved_key)
-        self.model = model
+        self.model = model or os.environ.get("DECISION_SIMULATOR_MODEL", "claude-sonnet-4-5-20250929")
 
-    def generate(self, system_prompt: str, user_prompt: str, max_tokens: int = 600) -> str:
-        """
-        Send a single-turn prompt to Claude and return the text response.
-
-        Args:
-            system_prompt: The system-level instruction (defines persona/role).
-            user_prompt: The user-facing message content.
-            max_tokens: Maximum tokens to generate in the response.
-
-        Returns:
-            The generated text, stripped of leading/trailing whitespace.
-
-        Raises:
-            anthropic.APIError: If the underlying API call fails.
-        """
+    def generate(self, system_prompt: str, user_prompt: str, *, max_tokens: int = 600) -> str:
+        if max_tokens < 1:
+            raise ValueError("max_tokens must be positive.")
         response = self._client.messages.create(
             model=self.model,
             max_tokens=max_tokens,
             system=system_prompt,
             messages=[{"role": "user", "content": user_prompt}],
         )
-        return response.content[0].text.strip()
+        text_parts = [block.text for block in response.content if getattr(block, "type", None) == "text"]
+        if not text_parts:
+            raise RuntimeError("Anthropic returned no text content.")
+        return "\n".join(text_parts).strip()
