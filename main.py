@@ -1,16 +1,18 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 
 import anthropic
 
 from src import __version__
 from src.client import ClaudeClient
-from src.interfaces import TextGenerator
-from src.validation import validate_decision, validate_options
 from src.debate import Debate
+from src.interfaces import TextGenerator
 from src.persona import build_personas
+from src.report import build_report, write_report
+from src.validation import validate_decision, validate_options
 
 
 def prompt(text: str) -> str:
@@ -21,7 +23,6 @@ def collect_inputs() -> tuple[str, list[str], str]:
     decision = prompt("What decision are you wrestling with?")
     if not decision:
         raise ValueError("Decision cannot be empty.")
-
     options: list[str] = []
     print("\nList the choices you're weighing (at least 2). Type 'done' when finished.")
     while True:
@@ -38,10 +39,7 @@ def collect_inputs() -> tuple[str, list[str], str]:
             print("Options must be distinct.")
             continue
         options.append(option)
-
-    user_context = prompt(
-        "\nAny context that matters (values, constraints, what you care about)?"
-    )
+    user_context = prompt("\nAny context that matters (values, constraints, what you care about)?")
     return decision, options, user_context
 
 
@@ -53,7 +51,6 @@ def run_simulation(
     *,
     rounds: int = 2,
 ) -> list[str]:
-    """Build personas and run one isolated simulation."""
     personas = build_personas(decision, options, user_context)
     return Debate(client, personas, decision).run(rounds=rounds)
 
@@ -64,19 +61,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("--decision", help="Decision to stress-test.")
-    parser.add_argument(
-        "--option",
-        action="append",
-        dest="options",
-        help="Decision option. Repeat this flag for each option.",
-    )
+    parser.add_argument("--option", action="append", dest="options", help="Decision option. Repeat for each option.")
     parser.add_argument("--context", default="", help="Background, values, and constraints.")
-    parser.add_argument(
-        "--rounds",
-        type=int,
-        default=2,
-        help="Number of debate rounds (default: 2).",
-    )
+    parser.add_argument("--rounds", type=int, default=2, help="Number of debate rounds (default: 2).")
+    parser.add_argument("--json", action="store_true", help="Print the completed report as JSON.")
+    parser.add_argument("--output", type=str, help="Write the completed report to a local JSON file.")
     return parser
 
 
@@ -99,22 +88,26 @@ def main(argv: list[str] | None = None, client: TextGenerator | None = None) -> 
 
         generator = client or ClaudeClient()
         transcript = run_simulation(
-            decision,
-            options,
-            user_context,
-            generator,
-            rounds=args.rounds,
+            decision, options, user_context, generator, rounds=args.rounds
         )
-    except (ValueError, anthropic.APIError) as exc:
+        report = build_report(
+            decision, options, user_context, args.rounds, transcript, __version__
+        )
+
+        if args.output:
+            write_report(report, args.output)
+        if args.json:
+            print(report.to_json(), end="")
+        else:
+            print("\n--- Debate ---\n")
+            for line in transcript:
+                print(line + "\n")
+    except (ValueError, anthropic.APIError, OSError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
     except KeyboardInterrupt:
         print("\nCancelled.", file=sys.stderr)
         return 130
-
-    print("\n--- Debate ---\n")
-    for line in transcript:
-        print(line + "\n")
     return 0
 
 
