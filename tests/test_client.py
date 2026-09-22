@@ -7,7 +7,7 @@ from decision_simulator.client import ClaudeClient
 
 
 def make_client() -> ClaudeClient:
-    with patch("src.client.anthropic.Anthropic") as factory:
+    with patch("decision_simulator.client.anthropic.Anthropic") as factory:
         client = ClaudeClient(api_key="test", model="test-model", max_retries=0)
         client._client = MagicMock()
         return client
