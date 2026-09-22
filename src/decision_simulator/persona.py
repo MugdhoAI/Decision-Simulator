@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from src.validation import validate_decision, validate_options
+from decision_simulator.validation import validate_decision, validate_options
 
 @dataclass
 class Persona:

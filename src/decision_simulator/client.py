@@ -6,7 +6,7 @@ from collections.abc import Callable
 
 import anthropic
 
-from src.interfaces import TextGenerator
+from decision_simulator.interfaces import TextGenerator
 
 
 class ClaudeClient(TextGenerator):

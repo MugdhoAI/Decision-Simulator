@@ -6,13 +6,13 @@ import sys
 
 import anthropic
 
-from src import __version__
-from src.client import ClaudeClient
-from src.debate import Debate
-from src.interfaces import TextGenerator
-from src.persona import build_personas
-from src.report import build_report, write_report
-from src.validation import validate_decision, validate_options
+from decision_simulator import __version__
+from decision_simulator.client import ClaudeClient
+from decision_simulator.debate import Debate
+from decision_simulator.interfaces import TextGenerator
+from decision_simulator.persona import build_personas
+from decision_simulator.report import build_report, write_report
+from decision_simulator.validation import validate_decision, validate_options
 
 
 def prompt(text: str) -> str:

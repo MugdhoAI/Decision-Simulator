@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import anthropic
 import pytest
 
-from src.client import ClaudeClient
+from decision_simulator.client import ClaudeClient
 
 
 def make_client() -> ClaudeClient:

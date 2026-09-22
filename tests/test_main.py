@@ -1,6 +1,6 @@
 import pytest
 
-from main import collect_inputs, run_simulation
+from decision_simulator.cli import collect_inputs, run_simulation
 
 
 class FakeClient:

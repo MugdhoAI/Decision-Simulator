@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.persona import build_personas
+from decision_simulator.persona import build_personas
 
 
 def test_build_personas_creates_one_per_option():

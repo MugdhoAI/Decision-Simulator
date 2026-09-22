@@ -1,5 +1,5 @@
 import pytest
-from src.validation import validate_decision, validate_options
+from decision_simulator.validation import validate_decision, validate_options
 
 def test_validate_decision_rejects_blank():
     with pytest.raises(ValueError):

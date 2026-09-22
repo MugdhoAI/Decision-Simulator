@@ -6,8 +6,8 @@ the test suite.
 
 import pytest
 
-from src.debate import Debate
-from src.persona import build_personas
+from decision_simulator.debate import Debate
+from decision_simulator.persona import build_personas
 
 
 class FakeClaudeClient:

@@ -1,4 +1,4 @@
-from main import build_parser
+from decision_simulator.cli import build_parser
 
 
 def test_parser_accepts_multiple_options():
@@ -18,7 +18,7 @@ def test_parser_defaults_to_interactive_mode():
 
 
 def test_cli_noninteractive_mode_runs_without_api():
-    from main import main
+    from decision_simulator.cli import main
 
     class FakeClient:
         def generate(self, system_prompt, user_prompt, *, max_tokens=600):

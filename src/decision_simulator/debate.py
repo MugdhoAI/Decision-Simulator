@@ -1,6 +1,6 @@
 from __future__ import annotations
-from src.interfaces import TextGenerator
-from src.persona import Persona
+from decision_simulator.interfaces import TextGenerator
+from decision_simulator.persona import Persona
 
 class Debate:
     """Orchestrate a multi-round debate between future-self personas."""
