@@ -1,6 +1,6 @@
 import json
 
-from src.report import build_report, write_report
+from decision_simulator.report import build_report, write_report
 
 
 def test_report_is_json_serializable(tmp_path):
