@@ -1,8 +1,10 @@
 # Decision Simulator
 
-Decision Simulator stress-tests a real choice by staging a debate between several simulated future versions of you. Each future self represents a different option, argues from that path, and responds to the other paths.
+Decision Simulator stress tests a real choice by staging a debate between several simulated future versions of you.
 
-It is a local Python CLI. The application sends prompts to Anthropic when you run a simulation, but it does not upload saved reports or operate a remote storage service.
+Each future self represents a different option, argues from that path, and responds to the other paths. The result is a structured debate that helps expose trade offs, assumptions, and possible consequences before making a decision.
+
+The application runs locally as a Python CLI. Live simulations send prompts to Anthropic. Saved reports remain local and are not uploaded to a remote storage service.
 
 ## Install
 
@@ -16,7 +18,7 @@ python -m pip install -e .
 
 Set `ANTHROPIC_API_KEY` before running a live simulation.
 
-## Use
+## Run a simulation
 
 Interactive mode:
 
@@ -30,7 +32,7 @@ Scriptable mode:
 decision-simulator --decision "Study abroad or stay" --option "Study abroad" --option "Stay" --context "I care about education, family, and building a startup" --rounds 2
 ```
 
-Print a machine-readable report:
+Generate a machine readable report:
 
 ```bash
 decision-simulator --decision "Study or work" --option "Study" --option "Work" --json
@@ -44,22 +46,39 @@ decision-simulator --decision "Study or work" --option "Study" --option "Work" -
 
 Reports contain the decision, options, context, round count, transcript, creation time, and application version.
 
+## How it works
+
+The application separates the debate engine from the model provider.
+
+1. The CLI validates the decision and options.
+2. Each option is represented as a different future perspective.
+3. The model generates arguments for each perspective.
+4. The perspectives respond to the competing paths.
+5. The completed debate can be printed or saved as JSON.
+
+This keeps the core decision flow independent from the model adapter and makes the application easier to test.
+
 ## Tests
+
+Install the development dependencies:
 
 ```bash
 python -m pip install -e ".[dev]"
+```
+
+Run the tests:
+
+```bash
 python -m pytest
 ```
 
 The test suite uses fake clients and mocks, so it does not require an Anthropic API key.
 
-## Structure
-
-The application is packaged under `src/decision_simulator`. The model adapter is separated from the debate engine through a small protocol, input validation happens before generation, transient API failures are retried, and completed simulations can be exported as local JSON.
-
 ## Security
 
-Never commit API keys or other secrets. See `SECURITY.md` for reporting guidance.
+Never commit API keys or other secrets.
+
+See `SECURITY.md` for reporting guidance.
 
 ## License
 
