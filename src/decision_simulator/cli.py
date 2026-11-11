@@ -105,7 +105,11 @@ def main(argv: list[str] | None = None, client: TextGenerator | None = None) -> 
     except (ValueError, anthropic.APIError, OSError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, EOFError):
+        # Ctrl+C interrupts a prompt, and Ctrl+D (or piped stdin
+        # running out) raises EOFError from the same input() call.
+        # Both mean the user left mid-question, so cancel the same
+        # way instead of dying with a traceback.
         print("\nCancelled.", file=sys.stderr)
         return 130
     return 0

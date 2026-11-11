@@ -28,3 +28,16 @@ def test_cli_noninteractive_mode_runs_without_api():
         ["--decision", "A or B", "--option", "A", "--option", "B", "--rounds", "1"],
         client=FakeClient(),
     ) == 0
+
+
+def test_cli_interactive_eof_cancels_cleanly(monkeypatch):
+    # Regression test: closing the input stream at a prompt (Ctrl+D,
+    # or piped stdin running out) used to escape main() as an
+    # EOFError traceback instead of cancelling like Ctrl+C does.
+    from decision_simulator.cli import main
+
+    def closed_input(prompt_text=""):
+        raise EOFError
+
+    monkeypatch.setattr("builtins.input", closed_input)
+    assert main([]) == 130
