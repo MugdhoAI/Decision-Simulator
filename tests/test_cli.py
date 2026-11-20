@@ -41,3 +41,23 @@ def test_cli_interactive_eof_cancels_cleanly(monkeypatch):
 
     monkeypatch.setattr("builtins.input", closed_input)
     assert main([]) == 130
+
+
+def test_cli_failing_client_exits_cleanly(capsys):
+    # Regression test: when the client raises RuntimeError (for
+    # example, ClaudeClient reporting that Anthropic returned no
+    # text content), main() used to let it escape as a traceback
+    # instead of exiting cleanly with an Error message.
+    from decision_simulator.cli import main
+
+    class FailingClient:
+        def generate(self, system_prompt, user_prompt, *, max_tokens=600):
+            raise RuntimeError("Anthropic returned no text content.")
+
+    result = main(
+        ["--decision", "A or B", "--option", "A", "--option", "B", "--rounds", "1"],
+        client=FailingClient(),
+    )
+    assert result == 1
+    captured = capsys.readouterr()
+    assert "Error: Anthropic returned no text content." in captured.err
