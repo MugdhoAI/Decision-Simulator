@@ -102,7 +102,7 @@ def main(argv: list[str] | None = None, client: TextGenerator | None = None) -> 
             print("\n--- Debate ---\n")
             for line in transcript:
                 print(line + "\n")
-    except (ValueError, anthropic.APIError, OSError) as exc:
+    except (ValueError, anthropic.APIError, OSError, RuntimeError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
     except (KeyboardInterrupt, EOFError):
